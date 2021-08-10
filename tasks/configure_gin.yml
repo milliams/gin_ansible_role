@@ -1,0 +1,224 @@
+- name: Ensure docker containers are started
+  become: yes
+  become_user: dockeradmin
+  community.docker.docker_compose:
+    project_src: /srv/gin/gin-dockerfile
+    state: present
+
+- name: Ensure gin is configured (install page)
+  ansible.builtin.uri:
+    url: "http://localhost:{{ gin_http_port }}/install"
+    method: POST
+    headers:
+      Content-Type: "application/x-www-form-urlencoded"
+    body_format: form-urlencoded
+    body:
+      db_type: "PostgreSQL"
+      db_host: "ginpgres:5432"
+      db_user: "postgres"
+      db_passwd: "{{ gin_postgres_password }}"
+      db_name: "postgres"
+      db_path: "/app/gogs/gogs.db"
+      ssl_mode: "disable"
+      app_name: "{{ gin_app_name }}"
+      repo_root_path: "/data/repos"
+      run_user: "git"
+      domain: "{{ gin_domain }}"
+      ssh_port: "22"
+      http_port: "3000"
+      app_url: "https://{{ gin_domain }}/"
+      log_root_path: "/app/gogs/log"
+      enable_captcha: "true"
+      admin_name: "{{ gin_admin_username }}"
+      admin_passwd: "{{ gin_admin_password }}"
+      admin_confirm_passwd: "{{ gin_admin_password }}"
+      admin_email: "{{ gin_admin_email }}"
+    status_code: [200, 302, 404]
+    return_content: true
+  register: gogs_install_resp
+  changed_when: gogs_install_resp.status == 302
+  failed_when: gogs_install_resp.status == 200
+
+- name: Ensure gin is configured (app.ini - general)
+  ansible.builtin.ini_file:
+    path: "/srv/gin/config/gogs/conf/app.ini"
+    section: null
+    option: "{{ item.key }}"
+    value: "{{ item.value }}"
+  loop: "{{ tag_data | dict2items }}"
+  vars:
+    tag_data:
+      CUSTOM_PATH: "/custom"
+      BRAND_NAME: "{{ gin_app_name }}"
+  notify:
+    - Restart gin
+
+- name: Ensure gin is configured (app.in - repository)
+  ansible.builtin.ini_file:
+    path: "/srv/gin/config/gogs/conf/app.ini"
+    section: "repository"
+    option: "{{ item.key }}"
+    value: "{{ item.value }}"
+  loop: "{{ tag_data | dict2items }}"
+  vars:
+    tag_data:
+      DISABLE_HTTP_GIT: "{{ gin_disable_http_git }}"
+      SHOW_HTTP_GIT: "{{ gin_show_http_git }}"
+      PREFERRED_LICENSES: "{{ gin_preferred_licenses }}"
+      RAW_CAPTCHA_MIN_FILE_SIZE: 50
+      CAPTCHA_MIN_FILE_SIZE: 5
+      FORCE_PRIVATE: "{{ gin_repository_force_private }}"
+      AUTO_INIT: "{{ gin_repository_auto_init }}"
+  notify:
+    - Restart gin
+
+- name: Ensure gin is configured (app.ini - server)
+  ansible.builtin.ini_file:
+    path: "/srv/gin/config/gogs/conf/app.ini"
+    section: "server"
+    option: "{{ item.key }}"
+    value: "{{ item.value }}"
+  loop: "{{ tag_data | dict2items }}"
+  vars:
+    tag_data:
+      DOMAIN: "{{ gin_domain }}"
+      ROOT_URL: "https://{{ gin_domain }}/"
+      DISABLE_SSH: false
+      SSH_PORT: 22
+      START_SSH_SERVER: false
+      OFFLINE_MODE: false
+      APP_DATA_PATH: "/data/tmp/appdata"
+      ENABLE_FEDERATED_AVATAR: "{{ gin_enable_federated_avatar }}"
+  notify:
+    - Restart gin
+
+- name: Ensure gin is configured (app.ini - session)
+  ansible.builtin.ini_file:
+    path: "/srv/gin/config/gogs/conf/app.ini"
+    section: "session"
+    option: "{{ item.key }}"
+    value: "{{ item.value }}"
+  loop: "{{ tag_data | dict2items }}"
+  vars:
+    tag_data:
+      PROVIDER: file
+      COOKIE_NAME: "{{ gin_session_cookie_name }}"
+  notify:
+    - Restart gin
+
+- name: Ensure gin is configured (app.ini - security)
+  ansible.builtin.ini_file:
+    path: "/srv/gin/config/gogs/conf/app.ini"
+    section: "security"
+    option: "{{ item.key }}"
+    value: "{{ item.value }}"
+  loop: "{{ tag_data | dict2items }}"
+  vars:
+    tag_data:
+      COOKIE_USERNAME: "{{ gin_session_cookie_name }}_user"
+      COOKIE_REMEMBER_NAME: "{{ gin_session_cookie_name }}_remember"
+      LOGIN_REMEMBER_DAYS: "{{ gin_login_remember_days }}"
+  notify:
+    - Restart gin
+
+- name: Ensure gin is configured (app.ini - repository.upload)
+  ansible.builtin.ini_file:
+    path: "/srv/gin/config/gogs/conf/app.ini"
+    section: "repository.upload"
+    option: "{{ item.key }}"
+    value: "{{ item.value }}"
+  loop: "{{ tag_data | dict2items }}"
+  vars:
+    tag_data:
+      ENABLED: true
+      TEMP_PATH: /data/tmp/uploads
+      ALLOWED_TYPES: "{{ gin_upload_allowed_types }}"
+      FILE_MAX_SIZE: "{{ gin_upload_file_max_size_MB }}"
+      ANNEX_FILE_MIN_SIZE: "{{ gin_upload_annex_file_min_size_MB }}"
+      MAX_FILES: "{{ gin_upload_max_files }}"
+  notify:
+    - Restart gin
+
+- name: Ensure gin is configured (app.ini - service)
+  ansible.builtin.ini_file:
+    path: "/srv/gin/config/gogs/conf/app.ini"
+    section: "service"
+    option: "{{ item.key }}"
+    value: "{{ item.value }}"
+  loop: "{{ tag_data | dict2items }}"
+  vars:
+    tag_data:
+      ACTIVE_CODE_LIVE_MINUTES: 180
+      RESET_PASSWD_CODE_LIVE_MINUTES: 1440
+      REGISTER_EMAIL_CONFIRM: "{{ gin_register_email_confirm }}"
+      DISABLE_REGISTRATION: "{{ gin_disable_registration }}"
+      REQUIRE_SIGNIN_VIEW: "{{ gin_require_signin_view }}"
+      ENABLE_NOTIFY_MAIL: "{{ gin_enable_notify_mail }}"
+      ENABLE_REVERSE_PROXY_AUTHENTICATION: false
+      ENABLE_REVERSE_PROXY_AUTO_REGISTRATION: false
+      ENABLE_CAPTCHA: "{{ gin_enable_captcha }}"
+  notify:
+    - Restart gin
+
+- name: Ensure gin is configured (app.ini - mailer)
+  ansible.builtin.ini_file:
+    path: "/srv/gin/config/gogs/conf/app.ini"
+    section: "mailer"
+    option: "{{ item.key }}"
+    value: "{{ item.value }}"
+  loop: "{{ tag_data | dict2items }}"
+  vars:
+    tag_data:
+      ENABLED: "{{ gin_mailer_enabled }}"
+      SEND_BUFFER_LEN: 100
+      SUBJECT: "%(APP_NAME)s"
+      HOST: "{{ gin_mailer_host }}"
+      SKIP_VERIFY: "{{ gin_mailer_skip_verify }}"
+      USE_CERTIFICATE: "{{ gin_mailer_user_certificate }}"
+      FROM: "{{ gin_mailer_from }}"
+      USER: "{{ gin_mailer_user }}"
+      PASSWD: "{{ gin_mailer_passwd }}"
+      USE_PLAIN_TEXT: "{{ gin_mailer_use_plain_text }}"
+  notify:
+    - Restart gin
+
+- name: Ensure gin is configured (app.ini - api)
+  ansible.builtin.ini_file:
+    path: "/srv/gin/config/gogs/conf/app.ini"
+    section: "api"
+    option: "{{ item.key }}"
+    value: "{{ item.value }}"
+  loop: "{{ tag_data | dict2items }}"
+  vars:
+    tag_data:
+      MAX_RESPONSE_ITEMS: "{{ gin_api_max_response_items }}"
+  notify:
+    - Restart gin
+
+- name: Ensure gin is configured (app.ini - ui)
+  ansible.builtin.ini_file:
+    path: "/srv/gin/config/gogs/conf/app.ini"
+    section: "ui"
+    option: "{{ item.key }}"
+    value: "{{ item.value }}"
+  loop: "{{ tag_data | dict2items }}"
+  vars:
+    tag_data:
+      THEME_COLOR_META_TAG: "{{ gin_ui_theme_color_meta_tag }}"
+  notify:
+    - Restart gin
+
+- name: Ensure gin is configured (app.ini - git)
+  ansible.builtin.ini_file:
+    path: "/srv/gin/config/gogs/conf/app.ini"
+    section: "git"
+    option: "{{ item.key }}"
+    value: "{{ item.value }}"
+  loop: "{{ tag_data | dict2items }}"
+  vars:
+    tag_data:
+      MAX_GIT_DIFF_LINES: "{{ gin_max_git_diff_lines }}"
+      MAX_GIT_DIFF_LINE_CHARACTERS: "{{ gin_max_git_diff_line_characters }}"
+      MAX_GIT_DIFF_FILES: "{{ gin_max_git_diff_files }}"
+  notify:
+    - Restart gin

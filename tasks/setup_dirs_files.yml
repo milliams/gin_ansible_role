@@ -1,0 +1,43 @@
+- name: Ensure gin service directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0775'
+    owner: ginuser
+    group: ginservice
+  loop:
+    - /srv/gin
+    - /srv/gin/config
+    - /srv/gin/volumes
+    - /srv/gin/gindata
+    - /srv/gin/config/gogs
+    - /srv/gin/config/gogs/notice
+    - /srv/gin/config/postgres
+    - /srv/gin/volumes/ginweb
+    - /srv/gin/gindata/gin-repositories
+    - /srv/gin/gindata/git-postgresdb
+    - /srv/gin/gin-dockerfile
+
+- name: Ensure gin docker-compose env exists
+  ansible.builtin.copy:
+    dest: /srv/gin/gin-dockerfile/.env
+    owner: ginuser
+    group: ginservice
+    mode: '0664'
+    content: COMPOSE_PROJECT_NAME=gin
+
+- name: Ensure postgres secrets file exists
+  ansible.builtin.template:
+    dest: /srv/gin/config/postgres/pgressecrets.env
+    src: pgressecrets.env
+    owner: ginuser
+    group: ginservice
+    mode: '0660'
+
+- name: Ensure docker-compose config exists
+  ansible.builtin.template:
+    dest: /srv/gin/gin-dockerfile/docker-compose.yml
+    src: docker-compose.yml
+    owner: ginuser
+    group: ginservice
+    mode: '0664'

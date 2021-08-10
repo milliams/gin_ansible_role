@@ -1,0 +1,17 @@
+- name: Ensure custom public styles are present
+  ansible.builtin.copy:
+    src: public
+    dest: /srv/gin/config/gogs
+    owner: ginuser
+    group: ginservice
+  notify:
+    - Restart gin
+
+- name: Ensure custom templates are present
+  ansible.builtin.copy:
+    src: templates
+    dest: /srv/gin/config/gogs
+    owner: ginuser
+    group: ginservice
+  notify:
+    - Restart gin

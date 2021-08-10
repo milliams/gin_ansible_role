@@ -1,0 +1,12 @@
+---
+- name: Ensure dependencies are installed and users are set up
+  include_tasks: install_dependencies_users.yml
+
+- name: Ensure directories and files exist
+  include_tasks: setup_dirs_files.yml
+
+- name: Ensure gin is configured and running
+  include_tasks: configure_gin.yml
+
+- name: Ensure custom files are present
+  include_tasks: custom_files_gin.yml

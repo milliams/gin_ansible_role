@@ -1,0 +1,8 @@
+---
+- name: Restart gin
+  become: yes
+  become_user: dockeradmin
+  community.docker.docker_compose:
+    project_src: /srv/gin/gin-dockerfile
+    state: present
+    restarted: true

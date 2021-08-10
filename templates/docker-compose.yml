@@ -1,0 +1,51 @@
+version: '3.8'
+services:
+
+  web:
+    image: gnode/gin-web:dev
+    volumes:
+      - ../gindata/gin-repositories:/data/repos:rw
+      - ../volumes/ginweb:/data:rw
+      - ../config/gogs:/custom:rw
+      - gintmp:/data/tmp:rw
+    restart: always
+    environment:
+      - PUID={{ ginuser_user.uid }}
+      - PGID={{ ginservice_group.gid }}
+      - GOGS_CUSTOM=/custom
+    ports:
+      - "{{ gin_ssh_port }}:22"
+      - "{{ gin_http_port }}:3000"
+    networks:
+      net:
+        aliases:
+          - ginweb
+    depends_on:
+      - db
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "10"
+
+  db:
+    image: postgres:11
+    env_file: ../config/postgres/pgressecrets.env
+    restart: always
+    networks:
+      net:
+        aliases:
+          - ginpgres
+    volumes:
+      - ../gindata/gin-postgresdb:/var/lib/postgresql/data:rw
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "10"
+
+volumes:
+  gintmp:
+
+networks:
+  net:

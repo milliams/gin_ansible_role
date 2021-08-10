@@ -1,0 +1,44 @@
+- name: Ensure docker is installed
+  community.general.zypper:
+    name: [docker]
+    state: present
+
+- name: Ensure docker is enabled
+  ansible.builtin.systemd:
+    name: docker
+    enabled: yes
+    masked: no
+    state: started
+
+- name: Ensure the gin service group exists
+  ansible.builtin.group:
+    name: ginservice
+    state: present
+  register: ginservice_group
+
+- name: Ensure gin user exists
+  ansible.builtin.user:
+    name: ginuser
+    group: ginservice
+    groups: [docker]
+    password_lock: yes
+  register: ginuser_user
+
+- name: Ensure non-root docker admin user exists
+  ansible.builtin.user:
+    name: dockeradmin
+    group: docker
+    password_lock: yes
+    groups: [ginservice]
+
+- name: Ensure pip is installed
+  community.general.zypper:
+    name: [python3-pip]
+    state: present
+
+- name: Ensure latest version of docker-compose is installed for dockeradmin
+  become: true
+  become_user: dockeradmin
+  ansible.builtin.pip:
+    name: docker-compose
+    extra_args: --user
