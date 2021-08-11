@@ -10,3 +10,9 @@
 
 - name: Ensure custom files are present
   include_tasks: custom_files_gin.yml
+
+- name: Acquire access token for gin operations
+  include_tasks: access_token.yml
+
+- name: Ensure custom service pages exist
+  include_tasks: custom_service_pages.yml

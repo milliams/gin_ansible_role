@@ -1,0 +1,45 @@
+- name: Check if Service organisation exists
+  uri:
+    url: "http://localhost:{{ gin_http_port }}/api/v1/orgs/Service"
+    headers:
+      Content-Type: application/json
+      Authorization: "token {{ gin_access_token }}"
+    status_code: [200, 404]
+  register: gin_service_org_exists
+
+- name: Ensure Service organisation exists
+  uri:
+    url: "http://localhost:{{ gin_http_port }}/api/v1/admin/users/{{ gin_admin_username }}/orgs"
+    method: POST
+    headers:
+      Content-Type: application/json
+      Authorization: "token {{ gin_access_token }}"
+    body: "{{ lookup('template', 'templates/create_service.json.j2') }}"
+    body_format: json
+    status_code: 201
+  register: gin_create_service_org_response
+  when: gin_service_org_exists.status == 404
+  changed_when: gin_create_service_org_response.status == 201
+
+- name: Check if Service/Info repo exists
+  uri:
+    url: "http://localhost:{{ gin_http_port }}/api/v1/repos/Service/Info"
+    headers:
+      Content-Type: application/json
+      Authorization: "token {{ gin_access_token }}"
+    status_code: [200, 404]
+  register: gin_get_info_repo
+
+- name: Ensure Service/Info repo exists
+  uri:
+    url: "http://localhost:{{ gin_http_port }}/api/v1/admin/users/Service/repos"
+    method: POST
+    headers:
+      Content-Type: application/json
+      Authorization: "token {{ gin_access_token }}"
+    body: "{{ lookup('template', 'templates/create_service_info.json.j2') }}"
+    body_format: json
+    status_code: 201
+  register: gin_create_service_info_response
+  when: gin_get_info_repo.status == 404
+  changed_when: gin_create_service_info_response.status == 201

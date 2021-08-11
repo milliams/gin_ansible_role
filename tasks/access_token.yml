@@ -1,0 +1,26 @@
+- name: Ensure access token exists
+  uri:
+    url: "http://localhost:{{ gin_http_port }}/api/v1/users/{{ gin_admin_username }}/tokens"
+    method: POST
+    headers:
+      Content-Type: application/json
+    body: "{{ lookup('file', 'files/token.json') }}"
+    body_format: json
+    user: "{{ gin_admin_username }}"
+    password: "{{ gin_admin_password }}"
+    force_basic_auth: true
+    status_code: [201, 422]
+
+- name: Get access token
+  uri:
+    url: "http://localhost:{{ gin_http_port }}/api/v1/users/{{ gin_admin_username }}/tokens"
+    method: GET
+    user: "{{ gin_admin_username }}"
+    password: "{{ gin_admin_password }}"
+    force_basic_auth: true
+    status_code: [200]
+  register: gin_get_access_token_resp
+
+- name: Register access token
+  set_fact:
+    gin_access_token: "{{ gin_get_access_token_resp.json[0].sha1 }}"
