@@ -48,6 +48,7 @@ gin_show_http_git | false | |
 gin_preferred_licenses | "Creative Commons CC0 1.0 Public Domain Dedication" | |
 gin_repository_force_private | true | |
 gin_repository_auto_init | true | |
+gin_public_files | public | Uses the files in `./files/public` by default, but you can copy and customize the folder to change the favicon or CSS. |
 
 Dependencies
 ------------
