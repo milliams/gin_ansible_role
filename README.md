@@ -78,3 +78,8 @@ License
 -------
 
 Apache 2.0
+
+Author Information
+------------------
+
+This role was written by Mika Pflüger (@mikapfl). Some parts are based on the [ansible gogs role](https://github.com/erjac77/ansible-role-gogs) by Eric Jacob (@erjac77).
