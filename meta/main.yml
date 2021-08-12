@@ -21,6 +21,6 @@ galaxy_info:
     - gin
     - science
 
-dependencies:
+collections:
   - community.general
   - community.docker

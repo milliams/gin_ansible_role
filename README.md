@@ -52,7 +52,7 @@ gin_repository_auto_init | true | |
 Dependencies
 ------------
 
-This role requires `community.general` and `community.docker`.
+This role requires the `community.general` and `community.docker` collections.
 
 Example Playbook
 ----------------
