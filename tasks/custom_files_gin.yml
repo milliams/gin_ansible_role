@@ -1,6 +1,6 @@
 - name: Ensure custom public styles are present
   ansible.builtin.copy:
-    src: public
+    src: "{{ gin_public_files }}"
     dest: /srv/gin/config/gogs
     owner: ginuser
     group: ginservice
