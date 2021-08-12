@@ -82,4 +82,4 @@ Apache 2.0
 Author Information
 ------------------
 
-This role was written by Mika Pflüger (@mikapfl). Some parts are based on the [ansible gogs role](https://github.com/erjac77/ansible-role-gogs) by Eric Jacob (@erjac77).
+This role was written by Mika Pflüger ([@mikapfl](https://github.com/mikapfl)). Some parts are based on the [ansible gogs role](https://github.com/erjac77/ansible-role-gogs) by Eric Jacob ([@erjac77](https://github.com/erjac77)).
