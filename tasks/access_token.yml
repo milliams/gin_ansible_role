@@ -4,6 +4,7 @@
     method: POST
     headers:
       Content-Type: application/json
+      Host: "{{ gin_domain }}"
     body: "{{ lookup('file', 'files/token.json') }}"
     body_format: json
     user: "{{ gin_admin_username }}"
@@ -15,6 +16,8 @@
   uri:
     url: "http://localhost:{{ gin_http_port }}/api/v1/users/{{ gin_admin_username }}/tokens"
     method: GET
+    headers:
+      Host: "{{ gin_domain }}"
     user: "{{ gin_admin_username }}"
     password: "{{ gin_admin_password }}"
     force_basic_auth: true

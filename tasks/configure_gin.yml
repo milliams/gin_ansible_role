@@ -11,6 +11,7 @@
     method: POST
     headers:
       Content-Type: "application/x-www-form-urlencoded"
+      Host: "{{ gin_domain }}"
     body_format: form-urlencoded
     body:
       db_type: "PostgreSQL"
@@ -38,6 +39,10 @@
   register: gogs_install_resp
   changed_when: gogs_install_resp.status == 302
   failed_when: gogs_install_resp.status == 200
+
+#- name: Print install answer
+#  ansible.builtin.debug:
+#    var: gogs_install_resp
 
 - name: Ensure gin is configured (app.ini - general)
   ansible.builtin.ini_file:

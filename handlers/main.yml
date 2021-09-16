@@ -1,8 +1,20 @@
 ---
-- name: Restart gin
+- name: Restart gin docker container
   become: yes
   become_user: dockeradmin
   community.docker.docker_compose:
     project_src: /srv/gin/gin-dockerfile
     state: present
     restarted: true
+  listen: "Restart gin"
+
+- name: Wait for gin web service
+  ansible.builtin.uri:
+    url: "http://localhost:{{ gin_http_port }}/"
+    headers:
+      Host: "{{ gin_domain }}"
+  register: result
+  until: result.status == 200
+  retries: 60
+  delay: 1
+  listen: "Restart gin"

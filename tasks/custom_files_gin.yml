@@ -15,3 +15,7 @@
     group: ginservice
   notify:
     - Restart gin
+
+# By calling flush_handlers, we make sure the handler is run *right now*
+- name: Ensure gin is restarted if needed
+  meta: flush_handlers

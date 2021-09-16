@@ -11,6 +11,7 @@
     - /srv/gin/volumes
     - /srv/gin/gindata
     - /srv/gin/config/gogs
+    - /srv/gin/config/gogs/conf
     - /srv/gin/config/gogs/notice
     - /srv/gin/config/postgres
     - /srv/gin/volumes/ginweb
@@ -41,3 +42,11 @@
     owner: ginuser
     group: ginservice
     mode: '0664'
+
+- name: Ensure gin config has proper rights if it exists
+  ansible.builtin.file:
+    path: /srv/gin/config/gogs/conf/app.ini
+    mode: '0664'
+    owner: ginuser
+    group: ginservice
+  ignore_errors: "yes"

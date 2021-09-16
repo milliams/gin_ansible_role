@@ -3,6 +3,16 @@ services:
 
   web:
     image: gnode/gin-web:dev
+    container_name: "web"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gin.rule=Host(`{{ gin_domain }}`)&&!PathPrefix(`/debug`)"
+      - "traefik.http.routers.gin.entrypoints=web"
+      - "traefik.http.services.gin.loadbalancer.server.port=3000"
+      - "traefik.tcp.routers.gin-ssh.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.gin-ssh.entrypoints=ssh"
+      - "traefik.tcp.routers.gin-ssh.service=gin-ssh-svc"
+      - "traefik.tcp.services.gin-ssh-svc.loadbalancer.server.port=22"
     volumes:
       - ../gindata/gin-repositories:/data/repos:rw
       - ../volumes/ginweb:/data:rw
@@ -13,15 +23,13 @@ services:
       - PUID={{ ginuser_user.uid }}
       - PGID={{ ginservice_group.gid }}
       - GOGS_CUSTOM=/custom
-    ports:
-      - "{{ gin_ssh_port }}:22"
-      - "{{ gin_http_port }}:3000"
     networks:
       net:
         aliases:
           - ginweb
     depends_on:
       - db
+      - traefik
     logging:
       driver: "json-file"
       options:
@@ -44,8 +52,32 @@ services:
         max-size: "1m"
         max-file: "10"
 
+  traefik:
+    image: "traefik:v2.5"
+    container_name: "traefik"
+    command:
+      # uncomment these for various debug info
+      #- "--log.level=DEBUG"
+      #- "--api.insecure=true"
+      #- "--accesslog=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.ssh.address=:22"
+    ports:
+      # uncomment this to get access to the web interface
+      #- "8080:8080"
+      - "{{ gin_http_port }}:80"
+      - "{{ gin_ssh_port }}:22"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - net
+      - default
+
 volumes:
   gintmp:
 
 networks:
   net:
+    internal: true
