@@ -4,6 +4,12 @@
   community.docker.docker_compose:
     project_src: /srv/gin/gin-dockerfile
     state: present
+  notify:
+    - "Wait gin"
+
+# By calling flush_handlers, we make sure the waiting for gin happens before the install
+- name: Ensure gin is fully started
+  meta: flush_handlers
 
 - name: Ensure gin is configured (install page)
   ansible.builtin.uri:

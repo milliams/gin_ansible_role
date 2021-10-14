@@ -1,6 +1,16 @@
+- name: Set distro-specific package names
+  ansible.builtin.include_vars:
+    file: "{{ lookup('first_found', params) }}"
+    name: "package"
+  vars:
+    params:
+      files:
+        - "packages_{{ ansible_facts['distribution'] }}.yml"
+        - "packages_default.yml"
+
 - name: Ensure docker is installed
-  community.general.zypper:
-    name: [docker]
+  ansible.builtin.package:
+    name: "{{ package.docker }}"
     state: present
 
 - name: Ensure docker is enabled
@@ -32,7 +42,7 @@
     groups: [ginservice]
 
 - name: Ensure pip is installed
-  community.general.zypper:
+  ansible.builtin.package:
     name: [python3-pip]
     state: present
 

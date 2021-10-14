@@ -17,4 +17,6 @@
   until: result.status == 200
   retries: 60
   delay: 1
-  listen: "Restart gin"
+  listen:
+    - "Restart gin"
+    - "Wait gin"
