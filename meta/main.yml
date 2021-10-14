@@ -16,6 +16,9 @@ galaxy_info:
   - name: opensuse
     versions:
       - 15.3
+  - name: debian
+    versions:
+      - bullseye
 
   galaxy_tags:
     - gin
