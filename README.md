@@ -62,7 +62,7 @@ A fairly minimal playbook to install gin at gin.example.com and switch off regis
 
     - hosts: my-gin-server
       roles:
-        - gin
+        - mikapfl.gin_ansible_role
       vars:
         gin_app_name: My gin
         gin_domain: gin.example.com
