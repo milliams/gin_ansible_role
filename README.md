@@ -74,6 +74,14 @@ A fairly minimal playbook to install gin at gin.example.com and switch off regis
         gin_disable_registration: true
         gin_enable_notify_mail: false
 
+Using the standard ssh port for gin
+-----------------------------------
+
+To make everything as smooth as possible for users, it is beneficial to use port 22 (the standard ssh port) for gin's ssh; however, that port is usually used to access the machine and in particular to configure it via ansible.
+
+To reconfigure the port without interruptions, use the [`mikapfl.reconfigure_ssh_port`](https://github.com/mikapfl/reconfigure_ssh_port) ansible role.
+
+
 License
 -------
 
