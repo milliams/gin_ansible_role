@@ -21,7 +21,7 @@
   uri:
     url:
       "{{ 'https' if gin_enable_letsencrypt_https else 'http' }}://localhost:\
-       { gin_https_port if gin_enable_letsencrypt_https else gin_http_port }}\
+       {{ gin_https_port if gin_enable_letsencrypt_https else gin_http_port }}\
        /api/v1/users/{{ gin_admin_username }}/tokens"
     method: GET
     headers:
