@@ -38,8 +38,8 @@
 
 - name: Ensure docker-compose config exists
   ansible.builtin.template:
-    dest: /srv/gin/gin-dockerfile/docker-compose.yml.jinja2
-    src: docker-compose.yml
+    dest: /srv/gin/gin-dockerfile/docker-compose.yml
+    src: docker-compose.yml.jinja2
     owner: ginuser
     group: ginservice
     mode: '0664'
