@@ -13,6 +13,7 @@
     url: "http://localhost:{{ gin_http_port }}/"
     headers:
       Host: "{{ gin_domain }}"
+    validate_certs: "{{ not gin_letsencrypt_staging }}"
   register: result
   until: result.status == 200
   retries: 60

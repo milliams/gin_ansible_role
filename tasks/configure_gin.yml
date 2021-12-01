@@ -44,6 +44,7 @@
       admin_email: "{{ gin_admin_email }}"
     status_code: [200, 302, 404]
     return_content: true
+    validate_certs: "{{ not gin_letsencrypt_staging }}"
   register: gogs_install_resp
   changed_when: gogs_install_resp.status == 302
   failed_when: gogs_install_resp.status == 200

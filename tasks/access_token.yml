@@ -12,6 +12,7 @@
     password: "{{ gin_admin_password }}"
     force_basic_auth: true
     status_code: [201, 422]
+    validate_certs: "{{ not gin_letsencrypt_staging }}"
 
 - name: Get access token
   uri:
@@ -23,6 +24,7 @@
     password: "{{ gin_admin_password }}"
     force_basic_auth: true
     status_code: [200]
+    validate_certs: "{{ not gin_letsencrypt_staging }}"
   register: gin_get_access_token_resp
 
 - name: Register access token
