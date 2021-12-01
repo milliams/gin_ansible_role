@@ -1,7 +1,9 @@
 ---
 - name: Ensure access token exists
   uri:
-    url: "http://localhost:{{ gin_http_port }}/api/v1/users/{{ gin_admin_username }}/tokens"
+    url:
+      "{{ 'https' if gin_enable_letsencrypt_https else 'http' }}://localhost:\
+       {{ gin_http_port }}/api/v1/users/{{ gin_admin_username }}/tokens"
     method: POST
     headers:
       Content-Type: application/json
@@ -16,7 +18,9 @@
 
 - name: Get access token
   uri:
-    url: "http://localhost:{{ gin_http_port }}/api/v1/users/{{ gin_admin_username }}/tokens"
+    url:
+      "{{ 'https' if gin_enable_letsencrypt_https else 'http' }}://localhost:\
+       {{ gin_http_port }}/api/v1/users/{{ gin_admin_username }}/tokens"
     method: GET
     headers:
       Host: "{{ gin_domain }}"
