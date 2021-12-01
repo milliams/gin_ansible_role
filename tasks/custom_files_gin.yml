@@ -5,6 +5,7 @@
     dest: /srv/gin/config/gogs
     owner: ginuser
     group: ginservice
+    mode: '0664'
   notify:
     - Restart gin
 
@@ -14,6 +15,7 @@
     dest: /srv/gin/config/gogs
     owner: ginuser
     group: ginservice
+    mode: '0664'
   notify:
     - Restart gin
 

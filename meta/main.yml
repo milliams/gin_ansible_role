@@ -1,5 +1,7 @@
 ---
 galaxy_info:
+  role_name: gin
+  namespace: mikapfl
   author: Mika Pflüger
   description: Install the gin scientific data sharing service using docker
   company: Potsdam Institute for Climate Impact Research (PIK) e. V.
