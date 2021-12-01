@@ -55,4 +55,4 @@
     mode: '0664'
     owner: ginuser
     group: ginservice
-  when: gin_config_stat.exists
+  when: gin_config_stat.stat.exists
