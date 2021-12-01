@@ -3,7 +3,8 @@
   uri:
     url:
       "{{ 'https' if gin_enable_letsencrypt_https else 'http' }}://localhost:\
-       {{ gin_http_port }}/api/v1/users/{{ gin_admin_username }}/tokens"
+       {{ gin_https_port if gin_enable_letsencrypt_https else gin_http_port }}\
+       /api/v1/users/{{ gin_admin_username }}/tokens"
     method: POST
     headers:
       Content-Type: application/json
@@ -20,7 +21,8 @@
   uri:
     url:
       "{{ 'https' if gin_enable_letsencrypt_https else 'http' }}://localhost:\
-       {{ gin_http_port }}/api/v1/users/{{ gin_admin_username }}/tokens"
+       { gin_https_port if gin_enable_letsencrypt_https else gin_http_port }}\
+       /api/v1/users/{{ gin_admin_username }}/tokens"
     method: GET
     headers:
       Host: "{{ gin_domain }}"
