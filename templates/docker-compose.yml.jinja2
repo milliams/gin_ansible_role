@@ -7,7 +7,13 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.gin.rule=Host(`{{ gin_domain }}`)&&!PathPrefix(`/debug`)"
+{% if gin_enable_letsencrypt_https %}
+      - "traefik.http.routers.gin.entrypoints=websecure"
+      - "traefik.http.routers.gin.tls=true"
+      - "traefik.http.routers.gin.tls.certresolver=default"
+{% else %}
       - "traefik.http.routers.gin.entrypoints=web"
+{% endif %}
       - "traefik.http.services.gin.loadbalancer.server.port=3000"
       - "traefik.tcp.routers.gin-ssh.rule=HostSNI(`*`)"
       - "traefik.tcp.routers.gin-ssh.entrypoints=ssh"
@@ -64,11 +70,26 @@ services:
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.ssh.address=:22"
+{% if gin_enable_letsencrypt_https %}
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.default.acme.email={{ gin_admin_email }}"
+      - "--certificatesresolvers.default.acme.storage=acme.json"
+      - "--certificatesresolvers.default.acme.httpchallenge.entrypoint=web"
+{% if gin_letsencrypt_staging %}
+      - "--certificatesresolvers.default.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+{% endif %}
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
+{% endif %}
     ports:
       # uncomment this to get access to the web interface
       #- "8080:8080"
       - "{{ gin_http_port }}:80"
       - "{{ gin_ssh_port }}:22"
+{% if gin_enable_letsencrypt_https %}
+      - "{{ gin_https_port }}:443"
+{% endif %}
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     networks:

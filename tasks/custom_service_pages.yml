@@ -16,7 +16,7 @@
       Content-Type: application/json
       Authorization: "token {{ gin_access_token }}"
       Host: "{{ gin_domain }}"
-    body: "{{ lookup('template', 'templates/create_service.json.j2') }}"
+    body: "{{ lookup('template', 'templates/create_service.json.jinja2') }}"
     body_format: json
     status_code: 201
   register: gin_create_service_org_response
@@ -41,7 +41,7 @@
       Content-Type: application/json
       Authorization: "token {{ gin_access_token }}"
       Host: "{{ gin_domain }}"
-    body: "{{ lookup('template', 'templates/create_service_info.json.j2') }}"
+    body: "{{ lookup('template', 'templates/create_service_info.json.jinja2') }}"
     body_format: json
     status_code: 201
   register: gin_create_service_info_response
