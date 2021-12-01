@@ -1,3 +1,4 @@
+---
 - name: Check if Service organisation exists
   uri:
     url: "http://localhost:{{ gin_http_port }}/api/v1/orgs/Service"

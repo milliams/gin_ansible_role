@@ -1,3 +1,4 @@
+---
 - name: Ensure access token exists
   uri:
     url: "http://localhost:{{ gin_http_port }}/api/v1/users/{{ gin_admin_username }}/tokens"

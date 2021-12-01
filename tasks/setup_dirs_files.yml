@@ -1,3 +1,4 @@
+---
 - name: Ensure gin service directories exist
   ansible.builtin.file:
     path: "{{ item }}"
@@ -43,10 +44,15 @@
     group: ginservice
     mode: '0664'
 
+- name: Check if gin config exists
+  ansible.builtin.stat:
+    path: /srv/gin/config/gogs/conf/app.ini
+  register: gin_config_stat
+
 - name: Ensure gin config has proper rights if it exists
   ansible.builtin.file:
     path: /srv/gin/config/gogs/conf/app.ini
     mode: '0664'
     owner: ginuser
     group: ginservice
-  ignore_errors: "yes"
+  when: gin_config_stat.exists

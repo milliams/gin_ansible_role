@@ -1,3 +1,4 @@
+---
 - name: Ensure custom public styles are present
   ansible.builtin.copy:
     src: "{{ gin_public_files }}"

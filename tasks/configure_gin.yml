@@ -1,5 +1,6 @@
+---
 - name: Ensure docker containers are started
-  become: yes
+  become: true
   become_user: dockeradmin
   community.docker.docker_compose:
     project_src: /srv/gin/gin-dockerfile
@@ -7,7 +8,8 @@
   notify:
     - "Wait gin"
 
-# By calling flush_handlers, we make sure the waiting for gin happens before the install
+# By calling flush_handlers, we make sure the waiting for gin happens
+# before the installation
 - name: Ensure gin is fully started
   meta: flush_handlers
 
@@ -46,9 +48,6 @@
   changed_when: gogs_install_resp.status == 302
   failed_when: gogs_install_resp.status == 200
 
-#- name: Print install answer
-#  ansible.builtin.debug:
-#    var: gogs_install_resp
 
 - name: Ensure gin is configured (app.ini - general)
   ansible.builtin.ini_file:

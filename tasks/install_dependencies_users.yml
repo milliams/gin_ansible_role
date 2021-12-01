@@ -1,3 +1,4 @@
+---
 - name: Set distro-specific package names
   ansible.builtin.include_vars:
     file: "{{ lookup('first_found', params) }}"
@@ -16,8 +17,8 @@
 - name: Ensure docker is enabled
   ansible.builtin.systemd:
     name: docker
-    enabled: yes
-    masked: no
+    enabled: true
+    masked: false
     state: started
 
 - name: Ensure the gin service group exists
@@ -31,14 +32,14 @@
     name: ginuser
     group: ginservice
     groups: [docker]
-    password_lock: yes
+    password_lock: true
   register: ginuser_user
 
 - name: Ensure non-root docker admin user exists
   ansible.builtin.user:
     name: dockeradmin
     group: docker
-    password_lock: yes
+    password_lock: true
     groups: [ginservice]
 
 - name: Ensure pip is installed

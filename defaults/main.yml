@@ -1,3 +1,4 @@
+---
 gin_ssh_port: 2121
 gin_http_port: 80
 gin_https_port: 443
