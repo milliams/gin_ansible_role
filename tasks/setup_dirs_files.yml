@@ -61,3 +61,4 @@
   ansible.builtin.copy:
     dest: /etc/systemd/system/gin.service
     src: gin.service
+    mode: '0644'
