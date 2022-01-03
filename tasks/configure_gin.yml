@@ -1,10 +1,8 @@
 ---
-- name: Ensure docker containers are started
-  become: true
-  become_user: dockeradmin
-  community.docker.docker_compose:
-    project_src: /srv/gin/gin-dockerfile
-    state: present
+- name: Ensure gin service is started
+  ansible.builtin.systemd:
+    state: started
+    name: gin
   notify:
     - "Wait gin"
 

@@ -1,0 +1,17 @@
+[Unit]
+Description=GIN scientific data versioning and sharing (via docker)
+Requires=docker.service
+After=docker.service
+
+[Service]
+WorkingDirectory=/srv/gin/gin-dockerfile
+ExecStart=/home/dockeradmin/.local/bin/docker-compose up
+ExecStop=/home/dockeradmin/.local/bin/docker-compose down
+TimeoutStartSec=0
+Restart=on-failure
+StartLimitIntervalSec=60
+StartLimitBurst=3
+User=dockeradmin
+
+[Install]
+WantedBy=multi-user.target

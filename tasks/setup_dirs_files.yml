@@ -56,3 +56,8 @@
     owner: ginuser
     group: ginservice
   when: gin_config_stat.stat.exists
+
+- name: Ensure systemd service definition file is present
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/gin.service
+    src: gin.service
