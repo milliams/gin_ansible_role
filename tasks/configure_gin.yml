@@ -2,6 +2,7 @@
 - name: Ensure gin service is started
   ansible.builtin.systemd:
     state: started
+    enabled: yes
     name: gin
   notify:
     - "Wait gin"
