@@ -7,7 +7,7 @@
       Authorization: "token {{ gin_access_token }}"
       Host: "{{ gin_domain }}"
     status_code: [200, 404]
-    validate_certs: "{{ not gin_letsencrypt_staging }}"
+    validate_certs: false
   register: gin_service_org_exists
 
 - name: Ensure Service organisation exists
@@ -21,7 +21,7 @@
     body: "{{ lookup('template', 'templates/create_service.json.jinja2') }}"
     body_format: json
     status_code: 201
-    validate_certs: "{{ not gin_letsencrypt_staging }}"
+    validate_certs: false
   register: gin_create_service_org_response
   when: gin_service_org_exists.status == 404
   changed_when: gin_create_service_org_response.status == 201
@@ -34,7 +34,7 @@
       Authorization: "token {{ gin_access_token }}"
       Host: "{{ gin_domain }}"
     status_code: [200, 404]
-    validate_certs: "{{ not gin_letsencrypt_staging }}"
+    validate_certs: false
   register: gin_get_info_repo
 
 - name: Ensure Service/Info repo exists
@@ -48,7 +48,7 @@
     body: "{{ lookup('template', 'templates/create_service_info.json.jinja2') }}"
     body_format: json
     status_code: 201
-    validate_certs: "{{ not gin_letsencrypt_staging }}"
+    validate_certs: false
   register: gin_create_service_info_response
   when: gin_get_info_repo.status == 404
   changed_when: gin_create_service_info_response.status == 201

@@ -1,9 +1,7 @@
 ---
 gin_ssh_port: 2121
-gin_http_port: 80
-gin_https_port: 443
-gin_enable_letsencrypt_https: false
-gin_letsencrypt_staging: false
+gin_http_port: 3000
+gin_https_port: 4433
 gin_enable_federated_avatar: true
 gin_session_cookie_name: gin_at_home
 gin_login_remember_days: 30

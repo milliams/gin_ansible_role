@@ -1,25 +1,8 @@
 ---
-- name: Set distro-specific package names
-  ansible.builtin.include_vars:
-    file: "{{ lookup('first_found', params) }}"
-    name: "package"
-  vars:
-    params:
-      files:
-        - "packages_{{ ansible_facts['distribution'] }}.yml"
-        - "packages_default.yml"
-
-- name: Ensure docker is installed
+- name: Ensure podman is installed
   ansible.builtin.package:
-    name: "{{ package.docker }}"
+    name: podman
     state: present
-
-- name: Ensure docker is enabled
-  ansible.builtin.systemd:
-    name: docker
-    enabled: true
-    masked: false
-    state: started
 
 - name: Ensure the gin service group exists
   ansible.builtin.group:
@@ -31,25 +14,35 @@
   ansible.builtin.user:
     name: ginuser
     group: ginservice
-    groups: [docker]
     password_lock: true
   register: ginuser_user
 
-- name: Ensure non-root docker admin user exists
-  ansible.builtin.user:
-    name: dockeradmin
-    group: docker
-    password_lock: true
-    groups: [ginservice]
+- name: Create XDG user dir for gin user
+  ansible.builtin.file:
+    path: /run/user/{{ ginuser_user.uid }}
+    state: directory
+    owner: ginuser
+    mode: o=rwx,g=,o=
 
-- name: Ensure pip is installed
-  ansible.builtin.package:
-    name: [python3-pip]
+- name: ginuser | Check if lingering is enabled
+  ansible.builtin.stat: 
+    path: /var/lib/systemd/linger/ginuser
+  register: linger
+
+- name: ginuser | Enable lingering
+  ansible.builtin.command: loginctl enable-linger ginuser
+  when: 
+    - not linger.stat.exists
+    - systemd_config.enable_linger | default('yes')
+
+- name: Set cap_setuid=ep on /usr/bin/newuidmap
+  community.general.capabilities:
+    path: /usr/bin/newuidmap
+    capability: cap_setuid=ep
     state: present
 
-- name: Ensure latest version of docker-compose is installed for dockeradmin
-  become: true
-  become_user: dockeradmin
-  ansible.builtin.pip:
-    name: docker-compose
-    extra_args: --user
+- name: Set cap_setuid=ep on /usr/bin/newgidmap
+  community.general.capabilities:
+    path: /usr/bin/newgidmap
+    capability: cap_setgid=ep
+    state: present

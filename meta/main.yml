@@ -1,10 +1,11 @@
 ---
 galaxy_info:
   role_name: gin
-  namespace: mikapfl
-  author: Mika Pflüger
+  namespace: milliams
+  author:
+    - Mika Pflüger
+    - Matt Williams
   description: Install the gin scientific data sharing service using docker
-  company: Potsdam Institute for Climate Impact Research (PIK) e. V.
 
   license: Apache-2.0
 
@@ -14,12 +15,9 @@ galaxy_info:
   # https://galaxy.ansible.com/api/v1/platforms/
   #
   platforms:
-    - name: opensuse
+    - name: EL
       versions:
-        - 15.3
-    - name: debian
-      versions:
-        - bullseye
+        - 9
 
   galaxy_tags:
     - gin
@@ -27,4 +25,4 @@ galaxy_info:
 
 collections:
   - community.general
-  - community.docker
+  - community.podman

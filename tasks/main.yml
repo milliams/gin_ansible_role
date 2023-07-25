@@ -5,6 +5,9 @@
 - name: Ensure directories and files exist
   include_tasks: setup_dirs_files.yml
 
+- name: Set up GIN pod
+  include_tasks: setup_gin_pod.yml
+
 - name: Ensure gin is configured and running
   include_tasks: configure_gin.yml
 

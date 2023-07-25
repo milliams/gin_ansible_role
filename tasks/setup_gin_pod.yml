@@ -1,0 +1,87 @@
+---
+- name: Create pod for GIN
+  containers.podman.podman_pod:
+    name: gin
+    ports:
+      - "{{ gin_ssh_port }}:22"
+      - "{{ gin_http_port }}:3000"
+      - "{{ gin_https_port }}:443"
+  become: yes
+  become_user: ginuser
+
+- name: Run GIN database container in pod
+  containers.podman.podman_container:
+    name: db
+    image: docker.io/library/postgres:11
+    pod: gin
+    state: present
+    volumes:
+      - /srv/gin/gindata/gin-postgresdb:/var/lib/postgresql/data:rw
+    env_file: /srv/gin/config/postgres/pgressecrets.env
+  become: yes
+  become_user: ginuser
+
+- name: Run GIN web container in pod
+  containers.podman.podman_container:
+    name: gin-web
+    image: docker.io/gnode/gin-web:dev
+    pod: gin
+    state: present
+    requires: db
+    volumes:
+      - /srv/gin/volumes/ginweb:/data:rw
+      - gintmp:/data/tmp:rw
+    env:
+      PUID: "{{ ginuser_user.uid }}"
+      PGID: "{{ ginservice_group.gid }}"
+  become: yes
+  become_user: ginuser
+
+- name: Generate systemd unit file for gin pod
+  containers.podman.podman_generate_systemd:
+    name: gin
+    dest: ~/.config/systemd/user
+  become: yes
+  become_user: ginuser
+- name: Ensure gin service is started
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    name: pod-gin
+    daemon-reload: true
+    scope: user
+  become: yes
+  become_user: ginuser
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ ginuser_user.uid }}"
+  notify:
+    - "Wait gin"
+
+- name: Forward ports to GIN
+  ansible.posix.firewalld:
+    port_forward:
+      - port: "{{ item.key }}"
+        proto: tcp
+        toport: "{{ item.value }}"
+    zone: public
+    permanent: true
+    immediate: true
+    state: enabled
+  loop: "{{ ports | dict2items }}"
+  vars:
+    ports:
+      80: "{{ gin_http_port }}"
+      443: "{{ gin_https_port }}"
+      21: "{{ gin_ssh_port }}"
+
+- name: Open HTTP port
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    zone: public
+    permanent: true
+    immediate: true
+    state: enabled
+  loop:
+    - http
+    #- https
+    - ssh

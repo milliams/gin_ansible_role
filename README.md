@@ -19,8 +19,6 @@ gin_postgres_password | - | Required: a random password used internally as a sha
 gin_ssh_port | 2121 | Port number used *on the host* |
 gin_http_port | 80 | Port number used *on the host* |
 gin_https_port | 443 | Port numer used *on the host* |
-gin_enable_letsencrypt_https | false | Enable https using an automatically requested let's encrypt cert |
-gin_letsencrypt_staging | false | Use the let's encrypt staging servers (for testing) |
 gin_enable_federated_avatar | true | |
 gin_session_cookie_name | gin_at_home | Change this to improve interoperability if using several gin instances |
 gin_login_remember_days | 30 | |
@@ -76,7 +74,6 @@ A fairly minimal playbook to install gin at gin.example.com and switch off regis
         gin_session_cookie_name: gin_at_example
         gin_disable_registration: true
         gin_enable_notify_mail: false
-        gin_enable_letsencrypt_https: true
 
 Using the standard ssh port for gin
 -----------------------------------

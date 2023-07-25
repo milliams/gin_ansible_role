@@ -1,12 +1,4 @@
 ---
-- name: Ensure gin service is started
-  ansible.builtin.systemd:
-    state: started
-    enabled: true
-    name: gin
-  notify:
-    - "Wait gin"
-
 # By calling flush_handlers, we make sure the waiting for gin happens
 # before the installation
 - name: Ensure gin is fully started
@@ -22,7 +14,7 @@
     body_format: form-urlencoded
     body:
       db_type: "PostgreSQL"
-      db_host: "ginpgres:5432"
+      db_host: "db:5432"
       db_user: "postgres"
       db_passwd: "{{ gin_postgres_password }}"
       db_name: "postgres"
@@ -43,7 +35,7 @@
       admin_email: "{{ gin_admin_email }}"
     status_code: [200, 302, 404]
     return_content: true
-    validate_certs: "{{ not gin_letsencrypt_staging }}"
+    validate_certs: false
   register: gogs_install_resp
   changed_when: gogs_install_resp.status == 302
   failed_when: gogs_install_resp.status == 200
@@ -51,7 +43,7 @@
 
 - name: Ensure gin is configured (app.ini - general)
   ansible.builtin.ini_file:
-    path: "/srv/gin/config/gogs/conf/app.ini"
+    path: "/srv/gin/volumes/ginweb/gogs/conf/app.ini"
     section: null
     option: "{{ item.key }}"
     value: "{{ item.value }}"
@@ -68,7 +60,7 @@
 
 - name: Ensure gin is configured (app.in - repository)
   ansible.builtin.ini_file:
-    path: "/srv/gin/config/gogs/conf/app.ini"
+    path: "/srv/gin/volumes/ginweb/gogs/conf/app.ini"
     section: "repository"
     option: "{{ item.key }}"
     value: "{{ item.value }}"
@@ -90,7 +82,7 @@
 
 - name: Ensure gin is configured (app.ini - server)
   ansible.builtin.ini_file:
-    path: "/srv/gin/config/gogs/conf/app.ini"
+    path: "/srv/gin/volumes/ginweb/gogs/conf/app.ini"
     section: "server"
     option: "{{ item.key }}"
     value: "{{ item.value }}"
@@ -113,7 +105,7 @@
 
 - name: Ensure gin is configured (app.ini - session)
   ansible.builtin.ini_file:
-    path: "/srv/gin/config/gogs/conf/app.ini"
+    path: "/srv/gin/volumes/ginweb/gogs/conf/app.ini"
     section: "session"
     option: "{{ item.key }}"
     value: "{{ item.value }}"
@@ -130,7 +122,7 @@
 
 - name: Ensure gin is configured (app.ini - security)
   ansible.builtin.ini_file:
-    path: "/srv/gin/config/gogs/conf/app.ini"
+    path: "/srv/gin/volumes/ginweb/gogs/conf/app.ini"
     section: "security"
     option: "{{ item.key }}"
     value: "{{ item.value }}"
@@ -148,7 +140,7 @@
 
 - name: Ensure gin is configured (app.ini - repository.upload)
   ansible.builtin.ini_file:
-    path: "/srv/gin/config/gogs/conf/app.ini"
+    path: "/srv/gin/volumes/ginweb/gogs/conf/app.ini"
     section: "repository.upload"
     option: "{{ item.key }}"
     value: "{{ item.value }}"
@@ -169,7 +161,7 @@
 
 - name: Ensure gin is configured (app.ini - service)
   ansible.builtin.ini_file:
-    path: "/srv/gin/config/gogs/conf/app.ini"
+    path: "/srv/gin/volumes/ginweb/gogs/conf/app.ini"
     section: "service"
     option: "{{ item.key }}"
     value: "{{ item.value }}"
@@ -193,7 +185,7 @@
 
 - name: Ensure gin is configured (app.ini - mailer)
   ansible.builtin.ini_file:
-    path: "/srv/gin/config/gogs/conf/app.ini"
+    path: "/srv/gin/volumes/ginweb/gogs/conf/app.ini"
     section: "mailer"
     option: "{{ item.key }}"
     value: "{{ item.value }}"
@@ -218,7 +210,7 @@
 
 - name: Ensure gin is configured (app.ini - api)
   ansible.builtin.ini_file:
-    path: "/srv/gin/config/gogs/conf/app.ini"
+    path: "/srv/gin/volumes/ginweb/gogs/conf/app.ini"
     section: "api"
     option: "{{ item.key }}"
     value: "{{ item.value }}"
@@ -234,7 +226,7 @@
 
 - name: Ensure gin is configured (app.ini - ui)
   ansible.builtin.ini_file:
-    path: "/srv/gin/config/gogs/conf/app.ini"
+    path: "/srv/gin/volumes/ginweb/gogs/conf/app.ini"
     section: "ui"
     option: "{{ item.key }}"
     value: "{{ item.value }}"
@@ -250,7 +242,7 @@
 
 - name: Ensure gin is configured (app.ini - git)
   ansible.builtin.ini_file:
-    path: "/srv/gin/config/gogs/conf/app.ini"
+    path: "/srv/gin/volumes/ginweb/gogs/conf/app.ini"
     section: "git"
     option: "{{ item.key }}"
     value: "{{ item.value }}"

@@ -1,11 +1,13 @@
 ---
-- name: Restart gin docker container
-  become: true
-  become_user: dockeradmin
-  community.docker.docker_compose:
-    project_src: /srv/gin/gin-dockerfile
-    state: present
-    restarted: true
+- name: Restart gin
+  ansible.builtin.systemd:
+    state: restarted
+    name: pod-gin
+    daemon-reload: true
+  become: yes
+  become_user: ginuser
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ ginuser_user.uid }}"
   listen: "Restart gin"
 
 - name: Wait for gin web service
@@ -13,7 +15,7 @@
     url: "http://localhost:{{ gin_http_port }}/"
     headers:
       Host: "{{ gin_domain }}"
-    validate_certs: "{{ not gin_letsencrypt_staging }}"
+    validate_certs: false
   register: result
   until: result.status == 200
   retries: 60
