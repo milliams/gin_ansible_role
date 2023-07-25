@@ -43,6 +43,7 @@
     dest: ~/.config/systemd/user
   become: yes
   become_user: ginuser
+
 - name: Ensure gin service is started
   ansible.builtin.systemd:
     state: started
